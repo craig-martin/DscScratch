@@ -23,6 +23,7 @@
                         "RemoveFimSet.ps1",
                         "SetFimManagementPolicyRule.ps1",
                         "SetFimSet.ps1",
+                        "SetFimWorkflowDefinition.ps1",
                         "SkipDuplicateCreateRequest.ps1",
                         "StartSQLAgentJob.ps1",
                         "SubmitFimRequest.ps1",
