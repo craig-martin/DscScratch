@@ -1,4 +1,6 @@
-﻿function Get-TargetResource
+﻿#Requires -Modules FimPowerShellModule
+
+function Get-TargetResource
 {
 <#
 .Synopsys
@@ -18,6 +20,8 @@ The Get-TargetResource cmdlet.
     Write-Verbose "Running as: $(Whoami)"
 
     Write-Verbose "Variables: `n$(Get-Variable | ft -AutoSize)"
+
+    Write-Verbose ("{0}" -F (get-module fim* | Out-String))
 
     $set = Get-FimObjectByXPath -Filter "/Set[DisplayName='$DisplayName']"
 
@@ -97,7 +101,7 @@ The Test-TargetResource cmdlet is used to validate if the resource is in a state
                     )} {
                         if ($boundParameter.Value -ne $set.($boundParameter.Key))
                         {
-                            Write-Verbose ("Set property is not the same: {0}`n {1}`n {2}" -F @(
+                            Write-Verbose (" Set property is not the same: {0}`n {1}`n {2}" -F @(
                                 $boundParameter.Key
                                 $set.($boundParameter.Key)
                                 $boundParameter.Value
@@ -110,7 +114,7 @@ The Test-TargetResource cmdlet is used to validate if the resource is in a state
                         $filterString = "<Filter xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' Dialect='http://schemas.microsoft.com/2006/11/XPathFilterDialect' xmlns='http://schemas.xmlsoap.org/ws/2004/09/enumeration'>{0}</Filter>" -F $SetFilter
                         if ($filterString -ne $set.Filter)
                         {
-                            Write-Verbose ("Set property is not the same: {0}`n {1}`n {2}" -F @(
+                            Write-Verbose (" Set property is not the same: {0}`n {1}`n {2}" -F @(
                                 $boundParameter.Key
                                 $set.Filter
                                 $filterString
@@ -185,7 +189,7 @@ The Set-TargetResource cmdlet.
         else
         {
             Write-Verbose "Set is present, so updating it: $DisplayName, $SetFilter, $Description"
-            Set-FimSet -DisplayName $DisplayName -Description $Description -Filter $SetFilter 
+            Set-FimSet -Identifier $set.DisplayName -DisplayName $DisplayName -Description $Description -Filter $SetFilter 
         }
     }
     elseif($Ensure -eq 'Absent')
