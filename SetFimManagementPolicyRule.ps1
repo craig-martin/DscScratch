@@ -278,11 +278,11 @@ function Set-FimManagementPolicyRule
         if ($PSBoundParameters.ContainsKey('ResourceAttributeNames'))
         {
             Compare-Object $ResourceAttributeNames $currentMpr.ActionParameter | ForEach-Object {
-                if ($_.SideIndicator -eq '=>')
+                if ($_.SideIndicator -eq '<=')
                 {
                     $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionParameter" -AttributeValue $_.InputObject
                 }
-                elseif ($_.SideIndicator -eq '<=')
+                elseif ($_.SideIndicator -eq '=>')
                 {
                     $changeSet += New-FimImportChange -Operation Delete -AttributeName "ActionParameter" -AttributeValue $_.InputObject
                 }
@@ -343,9 +343,20 @@ function Set-FimManagementPolicyRule
             ($AuthenticationWorkflowDefinition -is [Array])
             )
             {
-                foreach ($wf in $AuthenticationWorkflowDefinition)
-                {
-                    $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $wf
+                $AuthenticationWorkflowDefinitionWithUrn = @()
+                foreach($AuthnWF in $AuthenticationWorkflowDefinition)
+                { 
+                   $AuthenticationWorkflowDefinitionWithUrn +=  "urn:uuid:{0}" -F $AuthnWF.Guid
+                }
+                Compare-Object $AuthenticationWorkflowDefinitionWithUrn $currentMpr.AuthenticationWorkflowDefinition | ForEach-Object {
+                    if ($_.SideIndicator -eq '<=')
+                    {
+                        $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $_.InputObject
+                    }
+                    elseif ($_.SideIndicator -eq '=>')
+                    {
+                        $changeSet += New-FimImportChange -Operation Delete -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $_.InputObject
+                    }
                 }
             }
             else
@@ -366,9 +377,20 @@ function Set-FimManagementPolicyRule
             ($AuthorizationWorkflowDefinition -is [Array])
             )
             {
-                foreach ($wf in $AuthorizationWorkflowDefinition)
-                {
-                    $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $wf
+                $AuthorizationWorkflowDefinitionWithUrn = @()
+                foreach($AuthzWF in $AuthorizationWorkflowDefinition)
+                { 
+                   $AuthorizationWorkflowDefinitionWithUrn +=  "urn:uuid:{0}" -F $AuthzWF.Guid
+                }
+                Compare-Object $AuthorizationWorkflowDefinitionWithUrn $currentMpr.AuthorizationWorkflowDefinition | ForEach-Object {
+                    if ($_.SideIndicator -eq '<=')
+                    {
+                        $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $_.InputObject
+                    }
+                    elseif ($_.SideIndicator -eq '=>')
+                    {
+                        $changeSet += New-FimImportChange -Operation Delete -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $_.InputObject
+                    }
                 }
             }
             else
@@ -389,9 +411,20 @@ function Set-FimManagementPolicyRule
             ($ActionWorkflowDefinition -is [Array])
             )
             {
-                foreach ($wf in $ActionWorkflowDefinition)
-                {
-                    $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionWorkflowDefinition" -AttributeValue $wf
+                $ActionWorkflowDefinitionWithUrn = @()
+                foreach($ActionWF in $ActionWorkflowDefinition)
+                { 
+                   $ActionWorkflowDefinitionWithUrn +=  "urn:uuid:{0}" -F $ActionWF.Guid
+                }
+                Compare-Object $ActionWorkflowDefinitionWithUrn $currentMpr.ActionWorkflowDefinition | ForEach-Object {
+                    if ($_.SideIndicator -eq '<=')
+                    {
+                        $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionWorkflowDefinition" -AttributeValue $_.InputObject
+                    }
+                    elseif ($_.SideIndicator -eq '=>')
+                    {
+                        $changeSet += New-FimImportChange -Operation Delete -AttributeName "ActionWorkflowDefinition" -AttributeValue $_.InputObject
+                    }
                 }
             }
             else
