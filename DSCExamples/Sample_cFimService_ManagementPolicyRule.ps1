@@ -232,6 +232,42 @@ Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_Manage
 
 #endregion
 
+#region: Request MPR - change the Request Type
+Configuration Sample_cFimService_ManagementPolicyRule 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimService_ManagementPolicyRule _DscTestManagementPolicyRule1
+        {
+              
+            DisplayName  = "_DscTestManagementPolicyRule1"
+            Description  = 'bars'
+            Enabled      = $false
+            RequestorSet = 'Administrators' 
+            RequestType  = @('Read','Add')
+            GrantPermission = $true
+            Request = $true
+            ResourceSetBeforeRequest = 'All People'
+            ResourceSetAfterRequest = 'All People'
+            ResourceAttributeNames = 'ObjectID', 'DisplayName','Manager'
+            #AuthenticationWorkflowDefinition = ''
+            #AuthorizationWorkflowDefinition = ''
+            #ActionWorkflowDefinition = ''
+            Ensure       = "Present"
+            Credential   = $fimAdminCredential
+        }
+    } 
+} 
+
+Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
+
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+
+#endregion
+
 #region: Transition-In MPR with no WFs
 Configuration Sample_cFimService_ManagementPolicyRule 
 { 
@@ -248,6 +284,35 @@ Configuration Sample_cFimService_ManagementPolicyRule
             Enabled      = $true
             TransitionIn = $true  
             TransitionSet = 'Administrators'
+            #ActionWorkflowDefinition = ''
+            Ensure       = "Present"
+            Credential   = $fimAdminCredential
+        }
+    } 
+} 
+
+Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
+
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+
+#endregion
+
+#region: Transition-In MPR - change the TransitionSet
+Configuration Sample_cFimService_ManagementPolicyRule 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimService_ManagementPolicyRule _DscTestManagementPolicyRule2
+        {
+              
+            DisplayName  = "_DscTestManagementPolicyRule2"
+            Description  = 'fooz'
+            Enabled      = $true
+            TransitionIn = $true  
+            TransitionSet = 'All People'
             #ActionWorkflowDefinition = ''
             Ensure       = "Present"
             Credential   = $fimAdminCredential

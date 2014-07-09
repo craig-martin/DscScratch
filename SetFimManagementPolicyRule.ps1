@@ -257,11 +257,11 @@ function Set-FimManagementPolicyRule
         if ($PSBoundParameters.ContainsKey('RequestType'))
         {
             Compare-Object $RequestType $currentMpr.ActionType | ForEach-Object {
-                if ($_.SideIndicator -eq '=>')
+                if ($_.SideIndicator -eq '<=')
                 {
                     $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionType" -AttributeValue $_.InputObject
                 }
-                elseif ($_.SideIndicator -eq '<=')
+                elseif ($_.SideIndicator -eq '=>')
                 {
                     $changeSet += New-FimImportChange -Operation Delete -AttributeName "ActionType" -AttributeValue $_.InputObject
                 }
@@ -309,6 +309,11 @@ function Set-FimManagementPolicyRule
             $changeSet += New-FimImportChange -Operation Replace -AttributeName "ResourceFinalSet" -AttributeValue $ResourceSetAfterRequest
         }
 
+        if ($PSBoundParameters.ContainsKey('TransitionSet') -and $currentMpr.ResourceFinalSet -ne $TransitionSet)
+        {
+            $changeSet += New-FimImportChange -Operation Replace -AttributeName "ResourceFinalSet" -AttributeValue $TransitionSet
+        }
+
         ###TODO: AuthenticationWorkflowDefinition
 
         ###TODO: AuthorizationWorkflowDefinition
@@ -316,24 +321,14 @@ function Set-FimManagementPolicyRule
         ###TODO: ActionWorkflowDefinition
 
 
-        if ($PSBoundParameters.ContainsKey('TransitionIn') -or $PSBoundParameters.ContainsKey('TransitionOut'))
+        if ($PSBoundParameters.ContainsKey('TransitionIn') -and $currentMpr.ActionType -notcontains 'TransitionIn')
         {
-            if ($currentMpr.ManagementPolicyRuleType -ne "SetTransition")
-            {
-                $changeSet += New-FimImportChange -Operation Replace -AttributeName "ManagementPolicyRuleType" -AttributeValue "SetTransition"
-            }
-            if ($PSBoundParameters.ContainsKey('TransitionIn') -and $currentMpr.ActionType -ne 'TransitionIn')
-            {
-                $changeSet += New-FimImportChange -Operation Replace -AttributeName "ActionType" -AttributeValue 'TransitionIn'
-            }
-            if ($PSBoundParameters.ContainsKey('TransitionOut') -and $currentMpr.ActionType -ne 'TransitionOut')
-            {
-                $changeSet += New-FimImportChange -Operation Replace -AttributeName "ActionType" -AttributeValue 'TransitionOut'
-            }
-            if ($currentMpr.ActionParameter -ne "*")
-            {
-                ### TODO
-            }
+            throw "The Management Policy Rule type cannot be changed.  The MPR must be deleted then created again."
+        }
+
+        if ($PSBoundParameters.ContainsKey('TransitionOut') -and $currentMpr.ActionType -notcontains 'TransitionOut')
+        {
+            throw "The Management Policy Rule type cannot be changed.  The MPR must be deleted then created again."
         }
 
         if ($AuthenticationWorkflowDefinition)
