@@ -250,7 +250,8 @@ function Set-FimManagementPolicyRule
 
         if ($PSBoundParameters.ContainsKey('Request') -and $currentMpr.Request -ne $Request)
         {
-            $changeSet += New-FimImportChange -Operation Replace -AttributeName "ActionType" -AttributeValue "Request"
+            Write-Warning "TODO - fix the handling of 'Request'"
+            #$changeSet += New-FimImportChange -Operation Replace -AttributeName "ActionType" -AttributeValue "Request"
         }
 
         if ($PSBoundParameters.ContainsKey('RequestType'))
