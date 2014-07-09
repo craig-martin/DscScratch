@@ -25,7 +25,7 @@ FunctionsToExport = '*'
 
 # HelpInfoURI = ''
 
-NestedModules     = "cFimServiceSet.psm1","cFimService_Workflow.psm1"
+NestedModules     = "cFimServiceSet.psm1","cFimService_Workflow.psm1","cFimService_ManagementPolicyRule.psm1"
 
 # Modules that must be imported into the global environment prior to importing this module
 #RequiredModules = @("FimPowerShellModule")
