@@ -13,6 +13,7 @@ $Global:AllNodes =
     )
 }
 
+#region: Request MPR with no WFs
 Configuration Sample_cFimService_ManagementPolicyRule 
 { 
 
@@ -30,8 +31,8 @@ Configuration Sample_cFimService_ManagementPolicyRule
             #RelativeToResourceAttributeName = 'ObjectID'
             RequestType  = @('Read', 'Create')
             GrantPermission = $true
-            TransitionIn = 'Administrators' 
-            TransitionOut = 'Administrators' 
+            #TransitionIn = 'Administrators' 
+            #TransitionOut = 'Administrators' 
             Request = $true
             ResourceSetBeforeRequest = 'All People'
             ResourceSetAfterRequest = 'All People'
@@ -49,13 +50,49 @@ Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
 
 Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
 
+#endregion
 
+#region: Transition-In MPR with no WFs
+Configuration Sample_cFimService_ManagementPolicyRule 
+{ 
 
+    Import-DscResource -ModuleName FimPowerShellModule
 
+    Node (hostname) 
+    { 
+        cFimService_ManagementPolicyRule _DscTestManagementPolicyRule2
+        {
+              
+            DisplayName  = "_DscTestManagementPolicyRule2"
+            Description  = 'fooz'
+            Enabled      = $true
+            #RequestorSet = 'Administrators' 
+            #RelativeToResourceAttributeName = 'ObjectID'
+            #RequestType  = @('Read', 'Create')
+            #GrantPermission = $true
+            TransitionIn = $true 
+            #TransitionOut = 'Administrators' 
+            TransitionSet = 'Administrators'
+            #Request = $false
+            #ResourceSetBeforeRequest = 'All People'
+            #ResourceSetAfterRequest = 'All People'
+            #ResourceAttributeNames = 'ObjectID', 'DisplayName','Description'
+            #AuthenticationWorkflowDefinition = ''
+            #AuthorizationWorkflowDefinition = ''
+            #ActionWorkflowDefinition = ''
+            Ensure       = "Present"
+            Credential   = $fimAdminCredential
+        }
+    } 
+} 
 
-<#
-Change 'Ensure' to 'Absent'
-#>
+Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
+
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+
+#endregion
+
+#region Change 'Ensure' to 'Absent'
 Configuration Sample_cFimService_ManagementPolicyRule 
 { 
 
@@ -91,3 +128,5 @@ Configuration Sample_cFimService_ManagementPolicyRule
 Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
 
 Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+
+#endregion
