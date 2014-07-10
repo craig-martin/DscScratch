@@ -331,24 +331,35 @@ function Set-FimManagementPolicyRule
             throw "The Management Policy Rule type cannot be changed.  The MPR must be deleted then created again."
         }
 
-        if ($AuthenticationWorkflowDefinition)
+        if ($PSBoundParameters.ContainsKey('AuthenticationWorkflowDefinition'))
         {
-            if (($AuthenticationWorkflowDefinition -is [Guid]) -or
-            (($AuthenticationWorkflowDefinition -is [Array]) -and ($AuthenticationWorkflowDefinition.Length -eq 3))
-            )
+            if ($AuthenticationWorkflowDefinition -eq $null -and $currentMpr.AuthenticationWorkflowDefinition -eq $null)
             {
-                $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $AuthenticationWorkflowDefinition
+                ### do nothing.  done.
             }
-            elseif (($AuthenticationWorkflowDefinition -is [Guid[]]) -or
-            ($AuthenticationWorkflowDefinition -is [Array])
-            )
+            elseif ($AuthenticationWorkflowDefinition -eq $null -and $currentMpr.AuthenticationWorkflowDefinition -ne $null)
             {
-                $AuthenticationWorkflowDefinitionWithUrn = @()
-                foreach($AuthnWF in $AuthenticationWorkflowDefinition)
-                { 
-                   $AuthenticationWorkflowDefinitionWithUrn +=  "urn:uuid:{0}" -F $AuthnWF.Guid
+                ### need to delete all the WFs
+                $currentMpr.AuthenticationWorkflowDefinition | ForEach-Object {
+                    $changeSet += New-FimImportChange -Operation Delete -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $_
                 }
-                Compare-Object $AuthenticationWorkflowDefinitionWithUrn $currentMpr.AuthenticationWorkflowDefinition | ForEach-Object {
+            }
+            elseif ($AuthenticationWorkflowDefinition -ne $null -and $currentMpr.AuthenticationWorkflowDefinition -eq $null)
+            {
+                ### need to add all the supplied WFs
+                $AuthenticationWorkflowDefinition | ForEach-Object {
+                    $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $_
+                }
+            }
+            else
+            {
+                ### need to merge
+                $guidWithUrn = @()
+                foreach($workflowDefinition in $AuthenticationWorkflowDefinition)
+                { 
+                   $guidWithUrn +=  "urn:uuid:{0}" -F $workflowDefinition.Guid
+                }
+                Compare-Object $guidWithUrn $currentMpr.AuthenticationWorkflowDefinition | ForEach-Object {
                     if ($_.SideIndicator -eq '<=')
                     {
                         $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthenticationWorkflowDefinition" -AttributeValue $_.InputObject
@@ -359,30 +370,37 @@ function Set-FimManagementPolicyRule
                     }
                 }
             }
-            else
-            {
-                throw "Unsupported input for -AuthenticationWorkflowDefinition"
-            }
         }
 
-        if ($AuthorizationWorkflowDefinition)
+        if ($PSBoundParameters.ContainsKey('AuthorizationWorkflowDefinition'))
         {
-            if (($AuthorizationWorkflowDefinition -is [Guid]) -or
-            (($AuthorizationWorkflowDefinition -is [Array]) -and ($AuthorizationWorkflowDefinition.Length -eq 3))
-            )
+            if ($AuthorizationWorkflowDefinition -eq $null -and $currentMpr.AuthorizationWorkflowDefinition -eq $null)
             {
-                $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $AuthorizationWorkflowDefinition
+                ### do nothing.  done.
             }
-            elseif (($AuthorizationWorkflowDefinition -is [Guid[]]) -or
-            ($AuthorizationWorkflowDefinition -is [Array])
-            )
+            elseif ($AuthorizationWorkflowDefinition -eq $null -and $currentMpr.AuthorizationWorkflowDefinition -ne $null)
             {
-                $AuthorizationWorkflowDefinitionWithUrn = @()
-                foreach($AuthzWF in $AuthorizationWorkflowDefinition)
-                { 
-                   $AuthorizationWorkflowDefinitionWithUrn +=  "urn:uuid:{0}" -F $AuthzWF.Guid
+                ### need to delete all the WFs
+                $currentMpr.AuthorizationWorkflowDefinition | ForEach-Object {
+                    $changeSet += New-FimImportChange -Operation Delete -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $_
                 }
-                Compare-Object $AuthorizationWorkflowDefinitionWithUrn $currentMpr.AuthorizationWorkflowDefinition | ForEach-Object {
+            }
+            elseif ($AuthorizationWorkflowDefinition -ne $null -and $currentMpr.AuthorizationWorkflowDefinition -eq $null)
+            {
+                ### need to add all the supplied WFs
+                $AuthorizationWorkflowDefinition | ForEach-Object {
+                    $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $_
+                }
+            }
+            else
+            {
+                ### need to merge
+                $guidWithUrn = @()
+                foreach($workflowDefinition in $AuthorizationWorkflowDefinition)
+                { 
+                   $guidWithUrn +=  "urn:uuid:{0}" -F $workflowDefinition.Guid
+                }
+                Compare-Object $guidWithUrn $currentMpr.AuthorizationWorkflowDefinition | ForEach-Object {
                     if ($_.SideIndicator -eq '<=')
                     {
                         $changeSet += New-FimImportChange -Operation Add -AttributeName "AuthorizationWorkflowDefinition" -AttributeValue $_.InputObject
@@ -393,30 +411,37 @@ function Set-FimManagementPolicyRule
                     }
                 }
             }
-            else
-            {
-                throw "Unsupported input for -AuthorizationWorkflowDefinition"
-            }
         }
 
-        if ($ActionWorkflowDefinition)
+        if ($PSBoundParameters.ContainsKey('ActionWorkflowDefinition'))
         {
-            if (($ActionWorkflowDefinition -is [Guid]) -or
-            (($ActionWorkflowDefinition -is [Array]) -and ($ActionWorkflowDefinition.Length -eq 3))
-            )
+            if ($ActionWorkflowDefinition -eq $null -and $currentMpr.ActionWorkflowDefinition -eq $null)
             {
-                $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionWorkflowDefinition" -AttributeValue $ActionWorkflowDefinition
+                ### do nothing.  done.
             }
-            elseif (($ActionWorkflowDefinition -is [Guid[]]) -or
-            ($ActionWorkflowDefinition -is [Array])
-            )
+            elseif ($ActionWorkflowDefinition -eq $null -and $currentMpr.ActionWorkflowDefinition -ne $null)
             {
-                $ActionWorkflowDefinitionWithUrn = @()
-                foreach($ActionWF in $ActionWorkflowDefinition)
-                { 
-                   $ActionWorkflowDefinitionWithUrn +=  "urn:uuid:{0}" -F $ActionWF.Guid
+                ### need to delete all the WFs
+                $currentMpr.ActionWorkflowDefinition | ForEach-Object {
+                    $changeSet += New-FimImportChange -Operation Delete -AttributeName "ActionWorkflowDefinition" -AttributeValue $_
                 }
-                Compare-Object $ActionWorkflowDefinitionWithUrn $currentMpr.ActionWorkflowDefinition | ForEach-Object {
+            }
+            elseif ($ActionWorkflowDefinition -ne $null -and $currentMpr.ActionWorkflowDefinition -eq $null)
+            {
+                ### need to add all the supplied WFs
+                $ActionWorkflowDefinition | ForEach-Object {
+                    $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionWorkflowDefinition" -AttributeValue $_
+                }
+            }
+            else
+            {
+                ### need to merge
+                $guidWithUrn = @()
+                foreach($workflowDefinition in $ActionWorkflowDefinition)
+                { 
+                   $guidWithUrn +=  "urn:uuid:{0}" -F $workflowDefinition.Guid
+                }
+                Compare-Object $guidWithUrn $currentMpr.ActionWorkflowDefinition | ForEach-Object {
                     if ($_.SideIndicator -eq '<=')
                     {
                         $changeSet += New-FimImportChange -Operation Add -AttributeName "ActionWorkflowDefinition" -AttributeValue $_.InputObject
@@ -426,10 +451,6 @@ function Set-FimManagementPolicyRule
                         $changeSet += New-FimImportChange -Operation Delete -AttributeName "ActionWorkflowDefinition" -AttributeValue $_.InputObject
                     }
                 }
-            }
-            else
-            {
-                throw "Unsupported input for -ActionWorkflowDefinition"
             }
         }
 
