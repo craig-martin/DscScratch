@@ -27,7 +27,8 @@
                         "SkipDuplicateCreateRequest.ps1",
                         "StartSQLAgentJob.ps1",
                         "SubmitFimRequest.ps1",
-                        "WaitFimRequest.ps1"
+                        "WaitFimRequest.ps1",
+                        "WriteVerboseHashTable.ps1"
 
 # Functions to export from this module
 FunctionsToExport = '*'

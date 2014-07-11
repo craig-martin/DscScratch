@@ -10,7 +10,6 @@ function New-FimManagementPolicyRule
         $DisplayName,
         [Parameter(Mandatory = $false)]
         [String]
-        [ValidateNotNullOrEmpty()]
         $Description,
         [Parameter(Mandatory = $false)]
         [Switch]

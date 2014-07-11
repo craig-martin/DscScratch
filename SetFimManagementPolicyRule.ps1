@@ -92,7 +92,6 @@ function Set-FimManagementPolicyRule
         $DisplayName,
 
         [String]
-        [ValidateNotNullOrEmpty()]
         $Description,
 
         [Switch]

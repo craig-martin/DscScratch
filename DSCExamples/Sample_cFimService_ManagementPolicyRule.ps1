@@ -64,7 +64,7 @@ Configuration Sample_cFimService_ManagementPolicyRule
         {
               
             DisplayName  = "_DscTestManagementPolicyRule1"
-            Description  = 'bars'
+            Description  = ''
             Enabled      = $true
             RequestorSet = 'Administrators' 
             RequestType  = @('Read', 'Create')
@@ -85,6 +85,8 @@ Configuration Sample_cFimService_ManagementPolicyRule
 Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
 
 Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+
+Get-FimObjectByXPath -Filter "/ManagementPolicyRule[DisplayName='_DscTestManagementPolicyRule1']"
 
 #endregion
 
@@ -445,7 +447,77 @@ Configuration Sample_cFimService_ManagementPolicyRule
 Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
 
 Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+Get-FimObjectByXPath -Filter "/ManagementPolicyRule[DisplayName='_DscTestManagementPolicyRule1']" | select AuthorizationWorkflowDefinition
+#endregion
 
+#region: Request MPR - change the AuthorizationWorkflowDefinition (none)
+Configuration Sample_cFimService_ManagementPolicyRule 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimService_ManagementPolicyRule _DscTestManagementPolicyRule1
+        {
+              
+            DisplayName  = "_DscTestManagementPolicyRule1"
+            Description  = 'bars'
+            Enabled      = $false
+            RequestorSet = 'Administrators' 
+            RequestType  = @('Read','Add')
+            GrantPermission = $false
+            Request = $true
+            ResourceSetBeforeRequest = 'All People'
+            ResourceSetAfterRequest = 'All People'
+            ResourceAttributeNames = 'ObjectID', 'DisplayName','Manager'
+            AuthorizationWorkflowDefinition = $null
+            #ActionWorkflowDefinition = ''
+            Ensure       = "Present"
+            Credential   = $fimAdminCredential
+        }
+    } 
+} 
+
+Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
+
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+Get-FimObjectByXPath -Filter "/ManagementPolicyRule[DisplayName='_DscTestManagementPolicyRule1']" | select AuthorizationWorkflowDefinition
+#endregion
+
+#region: Request MPR - change the AuthorizationWorkflowDefinition (multiple)
+Configuration Sample_cFimService_ManagementPolicyRule 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimService_ManagementPolicyRule _DscTestManagementPolicyRule1
+        {
+              
+            DisplayName  = "_DscTestManagementPolicyRule1"
+            Description  = 'bars'
+            Enabled      = $false
+            RequestorSet = 'Administrators' 
+            RequestType  = @('Read','Add')
+            GrantPermission = $false
+            Request = $true
+            ResourceSetBeforeRequest = 'All People'
+            ResourceSetAfterRequest = 'All People'
+            ResourceAttributeNames = 'ObjectID', 'DisplayName','Manager'
+            AuthorizationWorkflowDefinition = 'Filter Validation Workflow for Administrators','Requestor Validation With Owner Authorization','Owner Approval Workflow'
+            #ActionWorkflowDefinition = ''
+            Ensure       = "Present"
+            Credential   = $fimAdminCredential
+        }
+    } 
+} 
+
+Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
+
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+Get-FimObjectByXPath -Filter "/ManagementPolicyRule[DisplayName='_DscTestManagementPolicyRule1']" | select AuthorizationWorkflowDefinition
 #endregion
 
 #region: Transition-In MPR with no WFs
