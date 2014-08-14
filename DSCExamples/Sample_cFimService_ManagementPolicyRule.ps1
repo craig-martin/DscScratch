@@ -640,7 +640,7 @@ Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_Manage
 Configuration Sample_cFimService_ManagementPolicyRule 
 { 
 
-    Import-DscResource -ModuleName FimPowerShellModule
+    Import-DscResource -ModuleName FimPowerShellModule 
 
     Node (hostname) 
     { 
@@ -682,6 +682,35 @@ Configuration Sample_cFimService_ManagementPolicyRule
             TransitionIn = $true  
             TransitionSet = 'Administrators'
             ActionWorkflowDefinition = 'Group Expiration Notification Workflow','Expiration Workflow'
+            Ensure       = "Present"
+            Credential   = $fimAdminCredential
+        }
+    } 
+} 
+
+Sample_cFimService_ManagementPolicyRule -ConfigurationData $Global:AllNodes
+
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\Sample_cFimService_ManagementPolicyRule"
+
+#endregion
+
+#region: Transition-In MPR with multiple Action WFs, then none
+Configuration Sample_cFimService_ManagementPolicyRule 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimService_ManagementPolicyRule _DscTestManagementPolicyRule5
+        {
+              
+            DisplayName  = "_DscTestManagementPolicyRule5"
+            Description  = 'fooz'
+            Enabled      = $true
+            TransitionIn = $true  
+            TransitionSet = 'Administrators'
+            ActionWorkflowDefinition = $null
             Ensure       = "Present"
             Credential   = $fimAdminCredential
         }
