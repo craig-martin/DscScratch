@@ -15,7 +15,6 @@ Import-Clixml C:\temp\fimImportChanges.clixml | ft -a
 
 #>
 
-
 Set-Location c:\fimdsc
 
 $fimAdminCredential = New-Object System.Management.Automation.PSCredential ("$(hostname)\administrator", (ConvertTo-SecureString 'PA$$w0rd' -AsPlainText -Force))
@@ -452,7 +451,6 @@ TestMpr -ConfigurationData $Global:AllNodes
 Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
 #endregion
 
-
 #region: Update Request MPR with Multiple Actions
 $displayName = "Mpr$(Get-Random -Minimum 100 -Maximum 999)"
 Configuration TestMpr 
@@ -504,6 +502,247 @@ Configuration TestMpr
             ManagementPolicyRuleType			= 'Request'
             Ensure								= "Present"
             Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+#endregion
+
+#region: Update Request MPR with Multiple ActionParameters
+$displayName = "Mpr$(Get-Random -Minimum 100 -Maximum 999)"
+Configuration TestMpr 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter						= 'Description','Country','FreezeLevel' 
+            ActionType							= 'Create','Delete','Add'
+            Description							= 'initial description'
+            Disabled							= $false
+            DisplayName							= $displayName
+            GrantRight							= $true
+            PrincipalRelativeToResource    		= 'Manager'
+            ResourceCurrentSet					= 'Administrators'
+			ResourceFinalSet					= 'Administrators'
+            ManagementPolicyRuleType			= 'Request'
+            Ensure								= "Present"
+            Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+
+Configuration TestMpr 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter						= 'Description','Domain','FreezeLevel','MiddleName' 
+            ActionType							= 'Create','Delete','Add'
+            Description							= 'initial description'
+            Disabled							= $false
+            DisplayName							= $displayName
+            GrantRight							= $true
+            PrincipalRelativeToResource    		= 'Manager'
+            ResourceCurrentSet					= 'Administrators'
+			ResourceFinalSet					= 'Administrators'
+            ManagementPolicyRuleType			= 'Request'
+            Ensure								= "Present"
+            Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+#endregion
+
+#region: Update Request MPR with WFs
+$displayName = "Mpr$(Get-Random -Minimum 100 -Maximum 999)"
+Configuration TestMpr 
+{ 
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter						= '*' 
+            ActionType							= 'Modify'          
+            Description							= 'initial description'
+            Disabled							= $false
+            DisplayName							= $displayName
+            GrantRight							= $true
+            PrincipalSet			    		= 'Administrators'
+            ResourceCurrentSet					= 'Administrators'
+			ResourceFinalSet					= 'Administrators'
+            ManagementPolicyRuleType			= 'Request'
+            AuthenticationWorkflowDefinition 	= 'Password Reset AuthN Workflow'
+			AuthorizationWorkflowDefinition 	= 'Owner Approval Workflow'
+			ActionWorkflowDefinition 			= 'Password Reset Action Workflow'
+            Ensure								= "Present"
+            Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+
+Configuration TestMpr 
+{ 
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter						= '*' 
+            ActionType							= 'Modify'          
+            Description							= 'initial description'
+            Disabled							= $false
+            DisplayName							= $displayName
+            GrantRight							= $true
+            PrincipalSet			    		= 'Administrators'
+            ResourceCurrentSet					= 'Administrators'
+			ResourceFinalSet					= 'Administrators'
+            ManagementPolicyRuleType			= 'Request'
+            AuthenticationWorkflowDefinition 	= 'Password Reset AuthN Workflow','System Workflow Required for Registration'
+			AuthorizationWorkflowDefinition 	= 'Owner Approval Workflow','Filter Validation Workflow for Administrators','Requestor Validation With Owner Authorization'
+			ActionWorkflowDefinition 			= 'Expiration Workflow'
+            Ensure								= "Present"
+            Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+#endregion
+
+#region: Update Request MPR with removing WFs
+$displayName = "Mpr$(Get-Random -Minimum 100 -Maximum 999)"
+Configuration TestMpr 
+{ 
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter						= '*' 
+            ActionType							= 'Modify'          
+            Description							= 'initial description'
+            Disabled							= $false
+            DisplayName							= $displayName
+            GrantRight							= $true
+            PrincipalSet			    		= 'Administrators'
+            ResourceCurrentSet					= 'Administrators'
+			ResourceFinalSet					= 'Administrators'
+            ManagementPolicyRuleType			= 'Request'
+            AuthenticationWorkflowDefinition 	= 'Password Reset AuthN Workflow','System Workflow Required for Registration'
+			AuthorizationWorkflowDefinition 	= 'Owner Approval Workflow','Filter Validation Workflow for Administrators','Requestor Validation With Owner Authorization'
+			ActionWorkflowDefinition 			= 'Expiration Workflow'
+            Ensure								= "Present"
+            Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+
+Configuration TestMpr 
+{ 
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter						= '*' 
+            ActionType							= 'Modify'          
+            Description							= 'initial description'
+            Disabled							= $false
+            DisplayName							= $displayName
+            GrantRight							= $true
+            PrincipalSet			    		= 'Administrators'
+            ResourceCurrentSet					= 'Administrators'
+			ResourceFinalSet					= 'Administrators'
+            ManagementPolicyRuleType			= 'Request'
+            Ensure								= "Present"
+            Credential							= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+#endregion
+
+#region: Delete Request MPR
+$displayName = "Mpr$(Get-Random -Minimum 100 -Maximum 999)"
+Configuration TestMpr 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter				= '*' 
+            ActionType					= 'Modify'          
+            Description					= 'initial description'
+            Disabled					= $false
+            DisplayName					= $displayName
+            GrantRight					= $true
+            PrincipalSet			    = 'Administrators'
+            ResourceCurrentSet			= 'Administrators'
+			ResourceFinalSet			= 'Administrators'
+            ManagementPolicyRuleType	= 'Request'
+            Ensure						= "Present"
+            Credential					= $fimAdminCredential
+        }
+    } 
+} 
+
+TestMpr -ConfigurationData $Global:AllNodes
+Start-DscConfiguration -Wait -Verbose -Path "C:\fimdsc\TestMpr"
+
+Configuration TestMpr 
+{ 
+
+    Import-DscResource -ModuleName FimPowerShellModule
+
+    Node (hostname) 
+    { 
+        cFimManagementPolicyRule $displayName
+        {
+            ActionParameter				= '*' 
+            ActionType					= 'Modify'          
+            Description					= 'initial description'
+            Disabled					= $false
+            DisplayName					= $displayName
+            GrantRight					= $true
+            PrincipalSet			    = 'Administrators'
+            ResourceCurrentSet			= 'Administrators'
+			ResourceFinalSet			= 'Administrators'
+            ManagementPolicyRuleType	= 'Request'
+            Ensure						= "Absent"
+            Credential					= $fimAdminCredential
         }
     } 
 } 
