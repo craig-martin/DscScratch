@@ -196,6 +196,7 @@ function Set-TargetResource
             {
                 ### need to delete all attribute values in FIM
                 $mpr.($fimAttributeType.Name) | ForEach-Object {
+                    Write-Warning "  Deleting $($fimAttributeType.Name) value: $($_)"
                     $fimImportChanges += New-FimImportChange -AttributeName $fimAttributeType.Name -AttributeValue $_ -Operation Delete
                 }
             }
@@ -203,6 +204,7 @@ function Set-TargetResource
             {
                 ### need to add all attribute values to FIM
                 $PSBoundParameters[$fimAttributeType.Name] | ForEach-Object {
+                    Write-Warning "  Adding   $($fimAttributeType.Name) value: $($_)"
                     $fimImportChanges += New-FimImportChange -AttributeName $fimAttributeType.Name -AttributeValue $_ -Operation Add
                 }
             }
@@ -211,13 +213,25 @@ function Set-TargetResource
                 Compare-Object $PSBoundParameters[$fimAttributeType.Name] $mpr.($fimAttributeType.Name) | ForEach-Object {
                     if ($_.SideIndicator -eq '<=')
                     {
+                        Write-Warning "  Deleting $($fimAttributeType.Name) value: $($_)"
                         $fimImportChanges += New-FimImportChange -Operation Add -AttributeName $fimAttributeType.Name -AttributeValue $_.InputObject
                     }
                     elseif ($_.SideIndicator -eq '=>')
                     {
+                        Write-Warning "  Adding   $($fimAttributeType.Name) value: $($_)"
                         $fimImportChanges += New-FimImportChange -Operation Delete -AttributeName $fimAttributeType.Name -AttributeValue $_.InputObject
                     }
                 }
+            }
+        }
+        elseif ($fimAttributeType.DataType -eq 'Boolean')
+        {
+            Write-Verbose "  From DSC: $($PSBoundParameters[$fimAttributeType.Name])"
+            Write-Verbose "  From FIM: $($mpr.($fimAttributeType.Name))"
+            if ($PSBoundParameters[$fimAttributeType.Name] -ne [Convert]::ToBoolean($mpr.($fimAttributeType.Name)) -or ($PSBoundParameters.ContainsKey($fimAttributeType.Name) -and -not $mpr.($fimAttributeType.Name)))
+            {
+                Write-Warning "  Updating $($fimAttributeType.Name) value: $($PSBoundParameters[$fimAttributeType.Name])"
+                $fimImportChanges += New-FimImportChange -Operation Replace -AttributeName $fimAttributeType.Name -AttributeValue $PSBoundParameters[$fimAttributeType.Name]
             }
         }
         else
@@ -227,6 +241,7 @@ function Set-TargetResource
 
             if ($PSBoundParameters[$fimAttributeType.Name] -ne $mpr.($fimAttributeType.Name))
             {
+                Write-Warning "  Updating $($fimAttributeType.Name) value: $($PSBoundParameters[$fimAttributeType.Name])"
                 $fimImportChanges += New-FimImportChange -Operation Replace -AttributeName $fimAttributeType.Name -AttributeValue $PSBoundParameters[$fimAttributeType.Name]
             }
         }
@@ -256,7 +271,7 @@ function Set-TargetResource
         else
         {
             Write-Verbose "Management Policy Rule is present, so updating it: $DisplayName, $($mpr.ObjectID)"
-            New-FimImportObject -ObjectType ManagementPolicyRule -State Put -TargetObjectIdentifier $mpr.ObjectID -replace 'urn:uuid:' -Changes $fimImportChanges -ApplyNow
+            New-FimImportObject -ObjectType ManagementPolicyRule -State Put -TargetObjectIdentifier ($mpr.ObjectID -replace 'urn:uuid:') -Changes $fimImportChanges -ApplyNow
         }
     }
     elseif($Ensure -eq 'Absent')
@@ -450,7 +465,7 @@ function Test-TargetResource
                     Write-Verbose "  From DSC: $($PSBoundParameters[$fimAttributeType.Name])"
                     Write-Verbose "  From FIM: $($mpr.($fimAttributeType.Name))"
                     if ($PSBoundParameters[$fimAttributeType.Name] -ne [Convert]::ToBoolean($mpr.($fimAttributeType.Name)))
-                    {[Convert]::ToBoolean($mpr.($fimAttributeType.Name))
+                    {
                         Write-Warning "  Management Policy Rule property is not the same."
                         $mprsAreTheSame = $false
                     }
