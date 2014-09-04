@@ -213,12 +213,12 @@ function Set-TargetResource
                 Compare-Object $PSBoundParameters[$fimAttributeType.Name] $mpr.($fimAttributeType.Name) | ForEach-Object {
                     if ($_.SideIndicator -eq '<=')
                     {
-                        Write-Warning "  Deleting $($fimAttributeType.Name) value: $($_)"
+                        Write-Warning "  Adding   $($fimAttributeType.Name) value: $($_.InputObject)"
                         $fimImportChanges += New-FimImportChange -Operation Add -AttributeName $fimAttributeType.Name -AttributeValue $_.InputObject
                     }
                     elseif ($_.SideIndicator -eq '=>')
                     {
-                        Write-Warning "  Adding   $($fimAttributeType.Name) value: $($_)"
+                        Write-Warning "  Deleting $($fimAttributeType.Name) value: $($_.InputObject)"
                         $fimImportChanges += New-FimImportChange -Operation Delete -AttributeName $fimAttributeType.Name -AttributeValue $_.InputObject
                     }
                 }
