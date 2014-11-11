@@ -1,6 +1,6 @@
 ﻿configuration SharePointPreReqPackages
 {
-    #Import-DsCResource -ModuleName xPendingReboot
+    Import-DsCResource -ModuleName xPendingReboot
 
     node (hostname)
     {
@@ -155,6 +155,11 @@
         }
         #endregion
 
+        xPendingReboot BeforeSharePointInstall
+        {
+            Name = "BeforeSharePointInstall"
+        }
+
         Package InstallSharePointFoundation
         {
             Ensure             = "Present"
@@ -162,7 +167,8 @@
             Path               = "C:\Temp\SharePointFoundation2013\Setup.exe"
             Arguments          = "/config C:\Temp\SharePointFoundation2013\files\setupsilent\config.xml"
             ProductID          = "90150000-1014-0000-1000-0000000FF1CE"
-            DependsOn          = "[Script]AppFabricUpdate","[WindowsFeature]ApplicationServer","[WindowsFeature]WebWebServer","[WindowsFeature]NetFramework45Full","[Package]WcfDataServices5","[Package]WcfDataServices56"
+            ReturnCode         = 8
+            DependsOn          = "[Script]AppFabricUpdate","[WindowsFeature]ApplicationServer","[WindowsFeature]WebWebServer","[WindowsFeature]NetFramework45Full","[Package]WcfDataServices5","[Package]WcfDataServices56", "[xPendingReboot]BeforeSharePointInstall"
         }
     }
 }
@@ -171,4 +177,4 @@ SharePointPreReqPackages -OutputPath c:\temp\SharePointPreReqPackages
 
 Set-DscLocalConfigurationManager -Path c:\temp\SharePointPreReqPackages
 
-Start-DscConfiguration -Verbose -Wait -Path c:\temp\SharePointPreReqPackages 
+Start-DscConfiguration -Verbose -Wait -Path c:\temp\SharePointPreReqPackages -Force
