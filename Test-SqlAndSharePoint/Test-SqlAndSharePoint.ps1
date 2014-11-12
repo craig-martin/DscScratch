@@ -94,9 +94,9 @@ configuration SqlAndSharePoint
             Ensure    = "Present"   
             Name      = "Microsoft SQL Server 2012 Native Client "
             #Path      = "C:\Temp\SharepointPreReqs\sqlncli.msi"
-            #ProductId = "49D665A2-4C2A-476E-9AB8-FCC425F526FC"
+            #ProductId = "D411E9C9-CE62-4DBF-9D92-4CB22B750ED5"
             Path      = "C:\Temp\SQL\1033_ENU_LP\x64\Setup\x64\sqlncli.msi"
-            ProductId = "D411E9C9-CE62-4DBF-9D92-4CB22B750ED5"
+            ProductId = "49D665A2-4C2A-476E-9AB8-FCC425F526FC"
             LogPath   = "c:\temp\sqlncli.log"
             Arguments = "IACCEPTSQLNCLILICENSETERMS=YES"
         }
