@@ -2,7 +2,8 @@
 Set-Location $HOME
 
 $SwitchName       = Get-VMSwitch -SwitchType External | Select-Object -expand Name -First 1
-$vmName           = "CraigmDev1111-4"
+$vmName           = "CraigmDev1112-3"
+$adminCredential  = New-Object System.Management.Automation.PSCredential $vmName\administrator,(ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
 $vhdFilePath      = "S:\Hyper-V\Virtual Hard Disks\$vmName.vhdx"
 $isoFolderPath    = "S:\ISO"
 $StartUpMemoryMB  = 4096
@@ -63,8 +64,16 @@ Set-VM -Name $vmName -ProcessorCount $ProcessorCount
 Start-VM -Name $vmName          
 
 ### Add a DVD Drive
-Add-VMDvdDrive -VMName $vmName
+#Add-VMDvdDrive -VMName $vmName
 
 ### Add the new VM to the TrustedHosts for this VM Host
 set-item WSMan:\localhost\Client\TrustedHosts –value $vmName
+
+### Enable RDP
+Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
+    #Allow incoming RDP on firewall
+    Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    #Enable secure RDP authentication
+    Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1   
+}
 
