@@ -91,10 +91,12 @@ configuration SqlAndSharePoint
 
         Package SqlNCli
         {
-            Ensure    = "Present"  
-            Path      = "C:\Temp\SharepointPreReqs\sqlncli.msi"
+            Ensure    = "Present"   
             Name      = "Microsoft SQL Server 2012 Native Client "
-            ProductId = "49D665A2-4C2A-476E-9AB8-FCC425F526FC"
+            #Path      = "C:\Temp\SharepointPreReqs\sqlncli.msi"
+            #ProductId = "49D665A2-4C2A-476E-9AB8-FCC425F526FC"
+            Path      = "C:\Temp\SQL\1033_ENU_LP\x64\Setup\x64\sqlncli.msi"
+            ProductId = "D411E9C9-CE62-4DBF-9D92-4CB22B750ED5"
             LogPath   = "c:\temp\sqlncli.log"
             Arguments = "IACCEPTSQLNCLILICENSETERMS=YES"
         }
@@ -167,6 +169,7 @@ configuration SqlAndSharePoint
         }
         #endregion
 
+        #NOTE - this warning can be safely ignored : "Unable to query CCM_ClientUtilities: Invalid namespace"
         xPendingReboot BeforeSharePointInstall
         {
             Name = "BeforeSharePointInstall"
