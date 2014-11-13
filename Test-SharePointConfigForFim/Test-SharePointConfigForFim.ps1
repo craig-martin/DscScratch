@@ -30,21 +30,21 @@ configuration SharePointConfigForFim
              ConfigurationModeFrequencyMins = '15'
         } 
 
-        Script SetupSharepointAdmin
+        Script FimSharePointConfiguration
         {
             #DependsOn = "[Package]InstallSharePointFoundation"
                  
             GetScript = {Return "SetupSharepointAdmin"}
             TestScript = {
                 add-pssnapin Microsoft.SharePoint.PowerShell
-                if (Get-SPServer)
+                if (Get-SPContentDatabase -WebApplication 'FIM SharePoint Web Application')
                 {
-                    Write-Verbose "SPServer Found, returning True"
+                    Write-Verbose "FIM Content Database found, returning True"
                     return $true                     
                 }
                 else
                 {
-                    Write-Verbose "SPServer Not Found, returning False"
+                    Write-Verbose "FIM Content Database not found, returning False"
                     return $false
                 }
             }
@@ -73,37 +73,6 @@ configuration SharePointConfigForFim
                 Write-Verbose "Installing Application Content..." 
                 Install-SPApplicationContent 
 
-                #REBOOT JUST BECUASE
-                #$global:DSCMachineStatus = 1    
-            }
-        }
-
-        Script SetupSharePointSite
-        {
-            
-            GetScript = {Return "SetupSharePointSite"}
-            TestScript = {
-                add-pssnapin Microsoft.SharePoint.PowerShell -ErrorAction SilentlyContinue
-                $contentService = [Microsoft.SharePoint.Administration.SPWebService]::ContentService
-                $viewStateOnServer = $contentService.ViewStateOnServer
-
-                $spSite = SpSite("Http://localhost") -ErrorAction SilentlyContinue
-                $allowSelfServiceUpgrade = $spSite.AllowSelfServiceUpgrade            
-
-                $fimSpWebApplication = Get-SPWebApplication -Identity 'FIM SharePoint Web Application' -ErrorAction SilentlyContinue
-
-                if ($viewStateOnServer -eq $false -and $allowSelfServiceUpgrade -eq $false -and $fimSpWebApplication)
-                {
-                    return $true
-                }
-                else
-                {
-                    return $false
-                }
-            }
-            SetScript = {
-                add-pssnapin Microsoft.SharePoint.PowerShell
-                
                 Write-Verbose "Creating SharePoint Web Application" 
                 New-SpWebApplication -Name "FIM SharePoint Web Application" -ApplicationPool "FIMAppPool" -AuthenticationMethod NTLM -ApplicationPoolAccount (Get-SPManagedAccount -Identity "$(hostname)\administrator") -Port 80 -URL http://localhost
                 
@@ -118,9 +87,10 @@ configuration SharePointConfigForFim
                 Write-Verbose "Disabling self service upgrade..."
                 $spSite = SpSite("http://localhost")
                 $spSite.AllowSelfServiceUpgrade = $false
-                                                           
+
+                #REBOOT JUST BECUASE
+                #$global:DSCMachineStatus = 1    
             }
-            DependsOn = "[Script]SetupSharepointAdmin"
         }
     }
 }

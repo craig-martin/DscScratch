@@ -13,9 +13,10 @@ configuration SqlAndSharePointDomainJoined
     Import-DscResource -ModuleName cSqlPs
     Import-DsCResource -ModuleName xPendingReboot
     Import-DsCResource -ModuleName xComputerManagement
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration
 
     $saCred                 = New-Object System.Management.Automation.PSCredential sa, (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
-    $domainCredential       = New-Object System.Management.Automation.PSCredential REDMOND\cmfim1, (ConvertTo-SecureString '12thM@nFactor%' -AsPlainText -Force)
+    $domainCredential       = New-Object System.Management.Automation.PSCredential REDMOND\cmfim1, (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
 
     node $AllNodes.NodeName
     {
@@ -203,6 +204,7 @@ configuration SqlAndSharePointDomainJoined
             SqlAdministratorCredential = $saCred
             PID = "7TFR8-FMK2W-MWDXP-J224F-JTR8F"
             SysAdminAccounts = 'administrator'
+            Features = 'SQLENGINE,FULLTEXT'
             #DependsOn = "[File]SQLServerIso"
         }
 
