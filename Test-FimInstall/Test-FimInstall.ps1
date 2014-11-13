@@ -16,6 +16,7 @@ configuration FimInstall
     Import-DscResource -ModuleName xPSDesiredStateConfiguration
 
     $saCred                 = New-Object System.Management.Automation.PSCredential sa,                   (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
+    $localAdminCred         = New-Object System.Management.Automation.PSCredential administrator,        (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
     $fimMaCred              = New-Object System.Management.Automation.PSCredential "$(hostname)\fimma",  (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
     $fimSvcCred             = New-Object System.Management.Automation.PSCredential "$(hostname)\fimsvc", (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
     $domainCredential       = New-Object System.Management.Automation.PSCredential REDMOND\cmfim1,       (ConvertTo-SecureString '12thManFactor%' -AsPlainText -Force)
@@ -72,13 +73,13 @@ configuration FimInstall
             State = "Running"
         }
 
-        Package FimService
+        xPackage FimService
         {
             Ensure             = "Present"
+            RunAsCredential    = $localAdminCred
             Name               = "Forefront Identity Manager Service and Portal"
             Path               = "c:\temp\fim\Service and Portal\service and portal.msi"
-            Arguments          = "
-                /passive 
+            Arguments          = " 
                 ADDLOCAL=CommonServices,WebPortals 
                 ACCEPT_EULA=1 
                 SQLSERVER_SERVER=localhost 
@@ -106,4 +107,4 @@ FimInstall -ConfigurationData $ConfigurationData -OutputPath c:\temp\FimInstall
 
 Set-DscLocalConfigurationManager -Path c:\temp\FimInstall
 Get-DscLocalConfigurationManager
-Start-DscConfiguration -Verbose -Wait -Path c:\temp\FimInstall 
+Start-DscConfiguration -Verbose -Wait -Path c:\temp\FimInstall -force

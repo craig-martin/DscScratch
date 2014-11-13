@@ -37,7 +37,7 @@ configuration SharePointConfigForFim
             GetScript = {Return "SetupSharepointAdmin"}
             TestScript = {
                 add-pssnapin Microsoft.SharePoint.PowerShell
-                if (Get-SPContentDatabase -WebApplication 'FIM SharePoint Web Application')
+                if (Get-SPContentDatabase -WebApplication 'FIM SharePoint Web Application' -ErrorAction SilentlyContinue)
                 {
                     Write-Verbose "FIM Content Database found, returning True"
                     return $true                     
