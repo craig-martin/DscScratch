@@ -73,31 +73,22 @@ configuration FimInstall
             State = "Running"
         }
 
+        #NOTE - this warning can be safely ignored : "Unable to query CCM_ClientUtilities: Invalid namespace"
+        xPendingReboot BeforeFimInstall
+        {
+            Name = "BeforeFimInstall"
+        }
+
         xPackage FimService
         {
             Ensure             = "Present"
-            RunAsCredential    = $localAdminCred
             Name               = "Forefront Identity Manager Service and Portal"
             Path               = "c:\temp\fim\Service and Portal\service and portal.msi"
-            Arguments          = " 
-                ADDLOCAL=CommonServices,WebPortals 
-                ACCEPT_EULA=1 
-                SQLSERVER_SERVER=localhost 
-                SERVICE_ACCOUNT_NAME=$($fimSvcCred.UserName) 
-                SERVICE_ACCOUNT_PASSWORD=$($fimSvcCred.GetNetworkCredential().Password)
-                SERVICE_ACCOUNT_DOMAIN=$($fimSvcCred.GetNetworkCredential().Domain) 
-                SERVICE_ACCOUNT_EMAIL=foo@bar.baz 
-                SYNCHRONIZATION_SERVER=$(hostname) 
-                SYNCHRONIZATION_SERVER_ACCOUNT=$($fimMaCred.UserName) 
-                MAIL_SERVER=localhost 
-                MAIL_SERVER_USE_SSL=0 
-                MAIL_SERVER_IS_EXCHANGE=0 
-                SERVICEADDRESS=$(hostname) 
-                SHAREPOINT_URL=http://localhost
-            "
+            RunAsCredential    = $localAdminCred
+            Arguments          = "ADDLOCAL=CommonServices,WebPortals ACCEPT_EULA=1 SQLSERVER_SERVER=localhost SERVICE_ACCOUNT_NAME=$($fimSvcCred.UserName) SERVICE_ACCOUNT_PASSWORD=$($fimSvcCred.GetNetworkCredential().Password) SERVICE_ACCOUNT_DOMAIN=$($fimSvcCred.GetNetworkCredential().Domain) SERVICE_ACCOUNT_EMAIL=foo@bar.baz SYNCHRONIZATION_SERVER=$(hostname) SYNCHRONIZATION_SERVER_ACCOUNT=$($fimMaCred.UserName) MAIL_SERVER=localhost MAIL_SERVER_USE_SSL=0 MAIL_SERVER_IS_EXCHANGE=0 SERVICEADDRESS=$(hostname) SHAREPOINT_URL=http://localhost"
             LogPath            = "c:\temp\fimservice.log"
             ProductID          = "8EB24D93-91BA-435D-BF88-9339C1C46362"
-            DependsOn          = "[Service]SQLAgentService","[Service]SPAdminV4Service","[User]FimMA"         
+            DependsOn          = "[xPendingReboot]BeforeFimInstall","[Service]SQLAgentService","[Service]SPAdminV4Service","[User]FimMA"         
         }
 
     }
