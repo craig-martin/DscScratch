@@ -1,0 +1,51 @@
+<!--
+
+This is the SharePoint Server 2013 config.xml file used for the FIM one-box
+
+References:
+    Config.xml reference (SharePoint Server 2010)  http://technet.microsoft.com/en-us/library/cc261668.aspx
+    The Habanero blog (http://habaneroconsulting.com/blog/posts/Automating_the_SharePoint_2010_installation.aspx)
+-->
+<Configuration>
+  <!-- SharePoint Foundation 2013 Configuration -->
+  <Package Id="sts">
+    <Setting Id="LAUNCHEDFROMSETUPSTS" Value="Yes" />
+  </Package>
+
+  <!--
+    Logging:
+        Type:     Verbose (I want it all, because I am not halting on errors)
+        Path:     Put it in %temp%: as well
+        Template: Microsoft SharePoint Foundation 2013  Setup -YYYYMMDDHHMMSSxxx.log
+    -->
+  <Logging Type="verbose" Path="%temp%" Template="Microsoft SharePoint Foundation 2013  Setup *.log"/>
+
+  <!--
+    (Windows Installer) Settings:
+        Setup Type:             Clean Install (not an upgrade)
+        Server Role:            Application (server is in a farm, not standalone)
+        Using UI Install Mode:  0 (silent)
+        Setup Reboot:           don't, just don't, like, ever
+    -->
+  <Setting Id="SETUPTYPE" Value="CLEAN_INSTALL"/>
+  <Setting Id="SERVERROLE" Value="APPLICATION"/>
+  <Setting Id="UsingUIInstallMode" Value="0"/>
+  <Setting Id="SETUP_REBOOT" Value="Never" />
+  
+  <!--
+    Display:
+        Level:            None (completely unattended)
+        CompletionNotice: No (I want to continue on once complete)
+        SuppressModal:    Yes (I don't want error messages to stop install)
+        NoCancel:         Yes (Does nothing since window is not visible)
+        AcceptEula:       Yes (doesn't matter because I have the product ID)
+    -->
+  <Display
+    		Level="Basic"
+    		CompletionNotice="No"
+    		SuppressModal="Yes"
+    		NoCancel="No"
+    		AcceptEula="Yes"
+	/>
+  
+</Configuration>
