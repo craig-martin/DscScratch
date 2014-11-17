@@ -109,7 +109,7 @@ configuration SqlAndSharePointDomainJoined
             LogPath   = "c:\temp\setup_msipc_x64.log"
             DependsOn = "[Package]MicrosoftIdentityExtensions"
         }
-
+        <#
         Package SqlNCli
         {
             Ensure    = "Present"   
@@ -121,7 +121,7 @@ configuration SqlAndSharePointDomainJoined
             LogPath   = "c:\temp\sqlncli.log"
             Arguments = "IACCEPTSQLNCLILICENSETERMS=YES"
         }
-
+        #>
         Package Synchronization
         {
             Ensure    = "Present"  
@@ -129,7 +129,7 @@ configuration SqlAndSharePointDomainJoined
             Name      = "Microsoft Sync Framework Runtime v1.0 SP1 (x64)"
             ProductId = "8438EC02-B8A9-462D-AC72-1B521349C001"
             LogPath   = "c:\temp\Synchronization.log"
-            DependsOn = "[Package]SqlNCli"
+            #DependsOn = "[Package]SqlNCli"
         }
 
         Package WcfDataServices5
@@ -226,7 +226,7 @@ configuration SqlAndSharePointDomainJoined
             Path               = "C:\Temp\SharePointFoundation2013\Setup.exe"
             Arguments          = "/config C:\Temp\SharePointFoundation2013\files\setupsilent\config.xml"
             ProductID          = "90150000-1014-0000-1000-0000000FF1CE"
-            ReturnCode         = 8
+            ReturnCode         = 0
             DependsOn          = "[Script]AppFabricUpdate","[WindowsFeature]ApplicationServer","[WindowsFeature]WebWebServer","[WindowsFeature]NetFramework45Full","[Package]WcfDataServices5","[Package]WcfDataServices56", "[xPendingReboot]BeforeSharePointInstall", "[cSqlServerInstall]InstallSQLServer"
         }
     }
