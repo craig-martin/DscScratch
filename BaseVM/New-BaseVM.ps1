@@ -2,7 +2,7 @@
 Set-Location $HOME
 
 $SwitchName       = Get-VMSwitch -SwitchType External | Select-Object -expand Name -First 1
-$vmName           = "CraigmDev1112-3"
+$vmName           = "WindowsServer2012R2-Image" #"CraigmDev1118-5"
 $adminCredential  = New-Object System.Management.Automation.PSCredential $vmName\administrator,(ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
 $vhdFilePath      = "S:\Hyper-V\Virtual Hard Disks\$vmName.vhdx"
 $isoFolderPath    = "S:\ISO"
@@ -46,7 +46,7 @@ $UnattendFile.Save($UnattendFilePath)
 ###
 $convertwindowsimageParameters = @{
 SourcePath          = (Join-Path $isoFolderPath en_windows_server_2012_r2_x64_dvd_2707946.iso)
-UnattendPath        = $UnattendFilePath
+#UnattendPath        = $UnattendFilePath
 Edition             = 'ServerDataCenter'
 VHDPath             = $vhdFilePath
 VHDPartitionStyle   = 'GPT'
@@ -56,18 +56,26 @@ RemoteDesktopEnable = $true
 & 'D:\Users\v-crmart\Desktop\VM Automation\convertwindowsimage.codeplex.com\Convert-WindowsImage.ps1' @convertwindowsimageParameters     
 
 
+### Install KB2883200 (DSC requires it)
+Mount-WindowsImage -ImagePath $vhdFilePath -Index 1 -Path s:\Temp
+Add-WindowsPackage -Path s:\Temp -PackagePath S:\Install\Windows8.1-KB2883200-x64.msu -Verbose
+Dismount-WindowsImage -Path s:\Temp -Save 
+
 ### Create the VM
 New-VM -Name $vmName -VHDPath $vhdFilePath -SwitchName $SwitchName -MemoryStartupBytes ($StartUpMemoryMB*1MB) -Generation 2 -BootDevice VHD 
 Set-VM -Name $vmName -ProcessorCount $ProcessorCount
 
 ### Start the VM
-Start-VM -Name $vmName          
+Start-VM -Name $vmName
 
 ### Add a DVD Drive
-#Add-VMDvdDrive -VMName $vmName
+Add-VMDvdDrive -VMName $vmName
+
+### Mount the ISO with the FIM OneBox Files
+Set-VMDvdDrive -VMName $vmName -Path S:\ISO\FimOneBoxFiles.iso
 
 ### Add the new VM to the TrustedHosts for this VM Host
-set-item WSMan:\localhost\Client\TrustedHosts –value $vmName
+set-item WSMan:\localhost\Client\TrustedHosts –value $vmName -Force
 
 ### Enable RDP
 Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
@@ -76,4 +84,13 @@ Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
     #Enable secure RDP authentication
     Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1   
 }
+
+
+
+### Install the Certificate and Private Key (DSC requires it)
+Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
+    Import-PfxCertificate –FilePath D:\Certificates\craigweb.corp.microsoft.com.pfx -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString 'J$p1ter' -AsPlainText -Force)
+}
+
+
 
