@@ -4,7 +4,7 @@ Set-Location $HOME
 $SwitchName       = Get-VMSwitch -SwitchType External | Select-Object -expand Name -First 1
 $ImageName        = "WindowsServer2012R2-Image"
 $ImageVhdFilePath = "S:\Hyper-V\Virtual Hard Disks\$ImageName.vhdx"
-$vmName           = "CraigmDev1118-5"
+$vmName           = "CraigmDev1118-7"
 $vhdFilePath      = "S:\Hyper-V\Virtual Hard Disks\$vmName.vhdx"
 $adminCredential  = New-Object System.Management.Automation.PSCredential $vmName\administrator,(ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
 $isoFolderPath    = "S:\ISO"
@@ -56,6 +56,9 @@ Mount-WindowsImage -ImagePath $vhdFilePath -Index 1 -Path s:\Temp
     ### Copy the Unattend XML
     Copy -Path $UnattendFilePath  -Destination S:\Temp\unattend.xml
 
+    ### Copy the DSC Resources into the VHD
+    dir S:\Install\DscResources | copy -Destination 'S:\Temp\Program Files\WindowsPowerShell\Modules' -Recurse -Force
+
 ### Close and Save the VHD
 Dismount-WindowsImage -Path s:\Temp -Save 
 
@@ -89,5 +92,9 @@ Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
     Import-PfxCertificate –FilePath D:\Certificates\craigweb.corp.microsoft.com.pfx -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString 'J$p1ter' -AsPlainText -Force)
 }
 
+### Start DSC
+Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
+     C:\Temp\Test-FimOneBox.ps1
+}
 
 

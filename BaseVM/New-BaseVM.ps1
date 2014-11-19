@@ -36,6 +36,6 @@ Mount-WindowsImage -ImagePath $ImageVhdFilePath -Index 1 -Path s:\Temp
 Add-WindowsPackage -Path s:\Temp -PackagePath S:\Install\Windows8.1-KB2883200-x64.msu -Verbose
 
 ### Copy the DSC Resources into the VHD
-dir S:\Install\DscResources\ | copy -Destination 'S:\Temp\Program Files\WindowsPowerShell\Modules' 
+dir S:\Install\DscResources -Recurse | copy -Destination 'S:\Temp\Program Files\WindowsPowerShell\Modules' 
 Dismount-WindowsImage -Path s:\Temp -Save 
 
