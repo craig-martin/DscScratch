@@ -4,7 +4,7 @@ Set-Location $HOME
 $SwitchName       = Get-VMSwitch -SwitchType External | Select-Object -expand Name -First 1
 $ImageName        = "WindowsServer2012R2-Image"
 $ImageVhdFilePath = "S:\Hyper-V\Virtual Hard Disks\$ImageName.vhdx"
-$vmName           = "CraigmDev1118-7"
+$vmName           = "CraigmDev1100-1"
 $vhdFilePath      = "S:\Hyper-V\Virtual Hard Disks\$vmName.vhdx"
 $adminCredential  = New-Object System.Management.Automation.PSCredential $vmName\administrator,(ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
 $isoFolderPath    = "S:\ISO"
@@ -54,7 +54,7 @@ Mount-WindowsImage -ImagePath $vhdFilePath -Index 1 -Path s:\Temp
     Copy -Path S:\Install\Test-FimOneBox -Destination 'S:\Temp\Temp' -Recurse
 
     ### Copy the Unattend XML
-    Copy -Path $UnattendFilePath  -Destination S:\Temp\unattend.xml
+    Copy -Path $UnattendFilePath  -Destination S:\Temp\unattend.xml -Force
 
     ### Copy the DSC Resources into the VHD
     dir S:\Install\DscResources | copy -Destination 'S:\Temp\Program Files\WindowsPowerShell\Modules' -Recurse -Force
@@ -66,17 +66,20 @@ Dismount-WindowsImage -Path s:\Temp -Save
 New-VM -Name $vmName -VHDPath $vhdFilePath -SwitchName $SwitchName -MemoryStartupBytes ($StartUpMemoryMB*1MB) -Generation 2 -BootDevice VHD 
 Set-VM -Name $vmName -ProcessorCount $ProcessorCount
 
-### Start the VM
+### Start the VM and wait for the OS
 Start-VM -Name $vmName
+do {Start-Sleep -Seconds 10} 
+until ((Get-VMIntegrationService $vmName | ?{$_.name -eq "Heartbeat"}).PrimaryStatusDescription -eq "OK")
+#TODO - test that WinRM works before proceeding
+
+### Add the new VM to the TrustedHosts for this VM Host
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value $vmName -Force
 
 ### Add a DVD Drive
 Add-VMDvdDrive -VMName $vmName
 
 ### Mount the ISO with the FIM OneBox Files
 Set-VMDvdDrive -VMName $vmName -Path S:\ISO\FimOneBoxFiles.iso
-
-### Add the new VM to the TrustedHosts for this VM Host
-set-item WSMan:\localhost\Client\TrustedHosts –value $vmName -Force
 
 ### Enable RDP
 Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
@@ -85,7 +88,6 @@ Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
     #Enable secure RDP authentication
     Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1   
 }
-
 
 ### Install the Certificate and Private Key (DSC requires it)
 Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
@@ -96,5 +98,4 @@ Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
 Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
      C:\Temp\Test-FimOneBox.ps1
 }
-
 
