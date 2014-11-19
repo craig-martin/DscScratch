@@ -99,3 +99,12 @@ Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
      C:\Temp\Test-FimOneBox.ps1
 }
 
+do{
+    Get-date
+    
+    $fimService = Invoke-Command -ComputerName $vmName -Credential $adminCredential -ScriptBlock {
+         get-service fimservice
+    } -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 60
+}
+until($fimService)
