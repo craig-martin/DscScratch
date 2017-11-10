@@ -19,7 +19,7 @@ configuration FimInstall
     $localAdminCred         = New-Object System.Management.Automation.PSCredential administrator,        (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
     $fimMaCred              = New-Object System.Management.Automation.PSCredential "$(hostname)\fimma",  (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
     $fimSvcCred             = New-Object System.Management.Automation.PSCredential "$(hostname)\fimsvc", (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
-    $domainCredential       = New-Object System.Management.Automation.PSCredential REDMOND\cmfim1,       (ConvertTo-SecureString '12thManFactor%' -AsPlainText -Force)
+    $domainCredential       = New-Object System.Management.Automation.PSCredential MyDomain\myFimServiceAccount,       (ConvertTo-SecureString 'PA$$w0rd2014' -AsPlainText -Force)
 
     node $AllNodes.NodeName
     {
